@@ -1,10 +1,13 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 from src.model import MNISTModel
 from datetime import datetime
-import os
 
 def train_model():
     # Set device
