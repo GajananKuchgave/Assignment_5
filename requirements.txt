@@ -3,3 +3,4 @@ torchvision
 pytest
 numpy
 setuptools 
+tqdm
