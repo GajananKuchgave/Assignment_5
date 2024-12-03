@@ -26,31 +26,71 @@ def train_model():
     # Initialize model
     model = MNISTModel().to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters())
+    
+    # Changed optimizer to SGD with specified parameters
+    optimizer = optim.SGD(model.parameters(), 
+                         lr=0.05,          # Learning rate
+                         momentum=0.9)      # Momentum
+    
+    print("\nOptimizer settings:")
+    print(f"- Type: SGD")
+    print(f"- Learning rate: 0.05")
+    print(f"- Momentum: 0.9")
     
     # Training
     model.train()
     print("\nStarting training...")
     
+    # Initialize metrics
+    running_loss = 0.0
+    correct = 0
+    total = 0
+    
     # Create progress bar for the entire epoch
     pbar = tqdm(train_loader, desc='Training')
-    running_loss = 0.0
     
     for batch_idx, (data, target) in enumerate(pbar):
         data, target = data.to(device), target.to(device)
+        
+        # Forward pass
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, target)
+        
+        # Backward pass
         loss.backward()
         optimizer.step()
         
-        # Update running loss and progress bar
+        # Update metrics
         running_loss = 0.9 * running_loss + 0.1 * loss.item()
-        pbar.set_postfix({'loss': f'{running_loss:.4f}'})
+        _, predicted = torch.max(output.data, 1)
+        total += target.size(0)
+        correct += (predicted == target).sum().item()
+        
+        # Calculate current accuracy
+        accuracy = 100 * correct / total
+        
+        # Update progress bar
+        pbar.set_postfix({
+            'loss': f'{running_loss:.4f}',
+            'accuracy': f'{accuracy:.2f}%'
+        })
+        
+        # Print detailed stats every 100 batches
+        if (batch_idx + 1) % 100 == 0:
+            print(f'\nBatch [{batch_idx + 1}/{len(train_loader)}]')
+            print(f'Loss: {running_loss:.4f}')
+            print(f'Training Accuracy: {accuracy:.2f}%')
     
-    # Save model with timestamp
+    # Print final training stats
+    final_accuracy = 100 * correct / total
+    print(f'\nFinal Training Stats:')
+    print(f'Loss: {running_loss:.4f}')
+    print(f'Accuracy: {final_accuracy:.2f}%')
+    
+    # Save model with timestamp and accuracy
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    save_path = f'model_mnist_{timestamp}.pth'
+    save_path = f'model_mnist_{timestamp}_acc{final_accuracy:.1f}.pth'
     torch.save(model.state_dict(), save_path)
     print(f"\nModel saved to {save_path}")
     return save_path
