@@ -1,3 +1,5 @@
+[![ML Pipeline](https://github.com/GajananKuchgave/Assignment_5/actions/workflows/ml-pipeline.yml/badge.svg)](https://github.com/GajananKuchgave/Assignment_5/actions/workflows/ml-pipeline.yml)
+ 
  # **ML Model with Training Pipeline**
  This project implements a complete CI/CD pipeline for training and testing a CNN model on the MNIST dataset.
  The pipeline includes model training, testing, and automated validation through GitHub Actions.
